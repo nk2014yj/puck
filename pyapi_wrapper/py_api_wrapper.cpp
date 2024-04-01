@@ -23,7 +23,7 @@
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 #include "pyapi_wrapper/py_api_wrapper.h"
-#include "puck/gflags/puck_gflags.h"
+
 #include "puck/puck/puck_index.h"
 #include "puck/tinker/tinker_index.h"
 #include "puck/hierarchical_cluster/hierarchical_cluster_index.h"
@@ -151,8 +151,11 @@ inline void ParallelFor(size_t start, size_t end, size_t numThreads, Function fn
     }
 }
 
-int PySearcher::search(uint32_t n, const float* query_fea, const uint32_t topk, float* distance,
-                       uint32_t* labels) {
+int PySearcher::search(uint32_t n, py::array_t<float>& py_query_fea,const uint32_t topk, py::array_t<float>& py_distance, py::array_t<uint32_t>& py_labels) {
+
+    const float* query_fea = static_cast<float*>(py_query_fea.request().ptr);
+    float* distance = static_cast<float*>(py_distance.request().ptr);
+    uint32_t* labels = static_cast<uint32_t*>(py_labels.request().ptr);
 
     /*
     ParallelFor(0, n, puck::FLAGS_context_initial_pool_size, [&](int id, int threadId) {
@@ -182,6 +185,5 @@ int PySearcher::search(uint32_t n, const float* query_fea, const uint32_t topk, 
 
     return 0;
 }
-
 PySearcher::~PySearcher() {};
 };//namespace py_puck_api

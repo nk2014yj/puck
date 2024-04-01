@@ -21,11 +21,15 @@
  *
  **/
 #pragma once
-
+#include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
+#include <pybind11/numpy.h>
 #include <iostream>
 #include <memory>
 #include "puck/index.h"
+#include "puck/gflags/puck_gflags.h"
 namespace py_puck_api {
+namespace py = pybind11;
 
 void update_gflag(const char* gflag_key, const char* gflag_val);
 class PySearcher {
@@ -34,11 +38,24 @@ public:
     void show();
     int init();
     int build(uint32_t n);
-    int search(uint32_t n, const float* query_fea,const uint32_t topk, float* distance, uint32_t* labels);
+    int search(uint32_t n, py::array_t<float>& query_fea,const uint32_t topk, py::array_t<float>& distance, py::array_t<uint32_t>& labels);
     ~PySearcher();
 private:
     std::unique_ptr<puck::Index> _index;
     uint32_t _dim;
 };
+PYBIND11_MODULE(py_puck, m){
+        m.doc() = "puck";
+        pybind11::class_<PySearcher>(m, "PySearcher")
+        .def(pybind11::init())
+        .def("show", &PySearcher::show)
+        .def("init", &PySearcher::init)
+        .def("build", &PySearcher::build)
+        .def("search", &PySearcher::search)
+        .def("show", &PySearcher::show);
+
+        m.def("update_gflag", &update_gflag);
+}
+
 };//namespace py_puck_api
 

@@ -21,7 +21,7 @@ import time
 import math
 import struct
 
-swig_ptr = py_puck_api.swig_ptr
+#swig_ptr = py_puck_api.swig_ptr
 class Puck(BaseANN):
     def __init__(self, metric, index_params):
         self._index_params = index_params
@@ -175,7 +175,8 @@ class Puck(BaseANN):
     
     def query(self, X, topK):
         n, d = X.shape
-        self.index.search(n, swig_ptr(X), topK, swig_ptr(self.res[0]), swig_ptr(self.res[1]))
+        #self.index.search(n, swig_ptr(X), topK, swig_ptr(self.res[0]), swig_ptr(self.res[1]))
+        self.index.search(n, X, topK, self.res[0], self.res[1])
         #print(self.res[0])
         #print(self.res[1])
     def get_results(self):

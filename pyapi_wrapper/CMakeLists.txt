@@ -1,20 +1,5 @@
-# SWIG compile for Python(3)
-
-find_package(SWIG REQUIRED)
-include(${SWIG_USE_FILE})
-
-find_package(PythonLibs "${Python3_VERSION_MAJOR}.${Python3_VERSION_MINOR}" EXACT REQUIRED)
-message(STATUS "Found PYTHON_INCLUDE_DIR: ${PYTHON_INCLUDE_DIR}")
-message(STATUS "Found PYTHON_LIBRARY: ${PYTHON_LIBRARY}")
-message(STATUS "Found CMAKE_LIBRARY_OUTPUT_DIRECTORY: ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}")
-
-include_directories(${PYTHON_INCLUDE_DIR})
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-
-set(CMAKE_SWIG_FLAGS "")
-
-set(SWIG_INTERFACE "./py_puck_api.i")
-file(GLOB SWIG_USED_CPP
+include_directories(..)
+file(GLOB PY_USED_CPP
         "../puck/*.cpp"
         "../puck/base/*.cpp"
         "../puck/gflags/*.cpp"
@@ -27,44 +12,23 @@ file(GLOB SWIG_USED_CPP
         "../puck/tinker/tinker_index.cpp"
         "./py_api_wrapper.cpp")
 
-set_source_files_properties(${SWIG_INTERFACE} PROPERTIES CPLUSPLUS ON)
-set_source_files_properties(${SWIG_INTERFACE} PROPERTIES SWIG_FLAGS "-includeall")
+ # find python3
+ find_package(Python3 ${PYTHON_MINIMUM_VERSION} REQUIRED COMPONENTS Interpreter Development)
+ find_package(pybind11 REQUIRED) #找到依赖
+ 
+ message(STATUS "Found Python: ${Python3_VERSION_MAJOR}.${Python3_VERSION_MINOR}.${Python3_VERSION_PATCH}")
+ if (NOT Python3_SITELIB)
+     message(FATAL_ERROR "site-packages not found. ")
+ else ()
+     message(STATUS "site-packages: ${Python3_SITELIB}")
+ endif ()
 
-include_directories(./
-                    ../
-                    ${MKLROOT}
-                    ${PYTHON_INCLUDE_DIR})
-
-# add     py_puck_api.cpp ->  py_puck_api.py _PyPuck.so    in a row
-swig_add_library(   PyPuck
-                    LANGUAGE python
-                    SOURCES ${SWIG_INTERFACE} ${SWIG_USED_CPP}
-                    OUTFILE_DIR ./py_puck_api_cpp
-                    OUTPUT_DIR ./)
-
-# link all the libraries
-swig_link_libraries(PyPuck ${PYTHON_LIBRARY} )
-swig_link_libraries(PyPuck  OpenMP::OpenMP_CXX)
-swig_link_libraries(PyPuck  ${MKL_LIBRARIES})
-
-message(STATUS "Found CMAKE_CURRENT_BINARY_DIR: ${CMAKE_CURRENT_BINARY_DIR}")
-
-if(NOT CMAKE_LIBRARY_OUTPUT_DIRECTORY)
-    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
-endif()
+ find_package(PythonLibs "${Python3_VERSION_MAJOR}.${Python3_VERSION_MINOR}" EXACT REQUIRED)
+message(STATUS "Found PYTHON_INCLUDE_DIR: ${PYTHON_INCLUDE_DIR}")
+message(STATUS "Found PYTHON_LIBRARY: ${PYTHON_LIBRARY}")
 message(STATUS "Found CMAKE_LIBRARY_OUTPUT_DIRECTORY: ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}")
-#copy file
-file(GLOB py_puck_lib "${CMAKE_CURRENT_BINARY_DIR}/py_puck_api.py")
 
-file(COPY ${py_puck_lib} DESTINATION ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})    
+set(PYTHON_EXECUTABLE "$/home/peisi.yj//miniconda3/envs/py38/bin/python3")
 
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/py_puck_api.py"
-    DESTINATION ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
-
-install(FILES ${py_puck_lib}
-    DESTINATION ${CMAKE_INSTALL_PREFIX}/puck)
-
-install(TARGETS PyPuck
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_PREFIX}/puck
-    LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/puck
-    )
+pybind11_add_module(py_puck_api py_api_wrapper.cpp)#重点
+target_link_libraries(py_puck_api PRIVATE puck)
