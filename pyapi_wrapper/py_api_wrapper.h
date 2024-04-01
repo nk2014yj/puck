@@ -44,7 +44,7 @@ private:
     std::unique_ptr<puck::Index> _index;
     uint32_t _dim;
 };
-PYBIND11_MODULE(py_puck, m){
+PYBIND11_MODULE(py_puck_api, m){
         m.doc() = "puck";
         pybind11::class_<PySearcher>(m, "PySearcher")
         .def(pybind11::init())
