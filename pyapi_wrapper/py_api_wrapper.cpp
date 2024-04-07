@@ -23,7 +23,7 @@
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 #include "pyapi_wrapper/py_api_wrapper.h"
-
+#include "puck/gflags/puck_gflags.h"
 #include "puck/puck/puck_index.h"
 #include "puck/tinker/tinker_index.h"
 #include "puck/hierarchical_cluster/hierarchical_cluster_index.h"
@@ -151,13 +151,9 @@ inline void ParallelFor(size_t start, size_t end, size_t numThreads, Function fn
     }
 }
 
-int PySearcher::search(uint32_t n, py::array_t<float>& py_query_fea,const uint32_t topk, py::array_t<float>& py_distance, py::array_t<uint32_t>& py_labels) {
+int PySearcher::search(uint32_t n, const float* query_fea, const uint32_t topk, float* distance,
+                       uint32_t* labels) {
 
-    const float* query_fea = static_cast<float*>(py_query_fea.request().ptr);
-    float* distance = static_cast<float*>(py_distance.request().ptr);
-    uint32_t* labels = static_cast<uint32_t*>(py_labels.request().ptr);
-
-    /*
     ParallelFor(0, n, puck::FLAGS_context_initial_pool_size, [&](int id, int threadId) {
         (void)threadId;
         puck::Request request;
@@ -168,20 +164,7 @@ int PySearcher::search(uint32_t n, py::array_t<float>& py_query_fea,const uint32
         response.distance = distance + id * topk;
         response.local_idx = labels + id * topk;
         _index->search(&request, &response);
-    });*/
-
-    #pragma omp parallel for schedule(dynamic, 1) default(none) shared(n, query_fea, topk, distance, labels)  
-    for (int64_t id = 0; id < (int64_t)n; id++)
-    {
-        puck::Request request;
-        puck::Response response;
-        request.topk = topk;
-        request.feature = query_fea + id * _dim;
-
-        response.distance = distance + id * topk;
-        response.local_idx = labels + id * topk;
-        _index->search(&request, &response);
-    }
+    });
 
     return 0;
 }
