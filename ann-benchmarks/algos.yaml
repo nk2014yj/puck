@@ -262,7 +262,7 @@ deep-10M:
                 "nprobe=150"
               ]
 
-    faiss-IVFPQ:
+    faiss-IVFSQ:
       docker-tag: billion-scale-benchmark-faissconda
       module: benchmark.algorithms.faiss_inmem
       constructor: FaissFactory
@@ -270,7 +270,7 @@ deep-10M:
       run-groups:
         base:
           args: |
-              [{"indexkey": "IVF31622,PQ96"
+              [{"indexkey": "IVF31622,SQ8"
                 }]
           query-args: |
               [ 
@@ -1264,7 +1264,7 @@ bigann-10M:
                 "nprobe=150"
               ]
 
-    faiss-IVFPQ:
+    faiss-IVFSQ:
       docker-tag: billion-scale-benchmark-faissconda
       module: benchmark.algorithms.faiss_inmem
       constructor: FaissFactory
@@ -1272,7 +1272,7 @@ bigann-10M:
       run-groups:
         base:
           args: |
-              [{"indexkey": "IVF31622,PQ128"
+              [{"indexkey": "IVF31622,SQ8"
                 }]
           query-args: |
               [ 
@@ -1748,7 +1748,7 @@ bigann-100M:
                 "nprobe=150"
               ]
 
-    faiss-IVFPQ:
+    faiss-IVFSQ:
       docker-tag: billion-scale-benchmark-faissconda
       module: benchmark.algorithms.faiss_inmem
       constructor: FaissFactory
@@ -1756,7 +1756,7 @@ bigann-100M:
       run-groups:
         base:
           args: |
-              [{"indexkey": "IVF100000,PQ128"
+              [{"indexkey": "IVF100000,SQ8"
                 }]
           query-args: |
               [ 
@@ -2062,7 +2062,7 @@ deep-100M:
                 "nprobe=150"
               ]
 
-    faiss-IVFPQ:
+    faiss-IVFSQ:
       docker-tag: billion-scale-benchmark-faissconda
       module: benchmark.algorithms.faiss_inmem
       constructor: FaissFactory
@@ -2070,7 +2070,7 @@ deep-100M:
       run-groups:
         base:
           args: |
-              [{"indexkey": "IVF100000,PQ96"
+              [{"indexkey": "IVF100000,SQ8"
                 }]
           query-args: |
               [ 
