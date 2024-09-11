@@ -214,7 +214,7 @@ int TinkerIndex::build() {
     }
 
     _tinker_index.reset(new similarity::Hnsw<float>(*_space.get(), object_data));
-    _tinker_index->SetGroupInfo(cell_start_memory_idx.size(), cell_start_memory_idx.data());
+    _tinker_index->SetGroupInfo(cell_start_memory_idx.size()-1, cell_start_memory_idx.data());
     _tinker_index->CreateIndex(*_any_params.get());
     std::string tinker_index_file = _conf.index_path + "/" + puck::FLAGS_tinker_file_name;
     _tinker_index->SaveIndex(tinker_index_file);
